@@ -105,14 +105,14 @@ async function handleApi(request, env) {
     const payload = `${expires}`;
     const sig = await hmac(payload, env.SESSION_SECRET);
     return json({ ok: true }, 200, {
-      "Set-Cookie": `kucir_session=${payload}.${sig}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=43200`
+      "Set-Cookie": `KONEK_session=${payload}.${sig}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=43200`
     });
   }
 
   if (path === "/api/logout" && request.method === "POST") {
     if (!sameOrigin(request)) return json({ error: "Forbidden" }, 403);
     return json({ ok: true }, 200, {
-      "Set-Cookie": "kucir_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0"
+      "Set-Cookie": "KONEK_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0"
     });
   }
 
@@ -316,7 +316,7 @@ async function randomSlug(env, length = 8) {
 async function isAuthed(request, env) {
   if (!env.SESSION_SECRET) return false;
   const cookie = request.headers.get("Cookie") || "";
-  const m = cookie.match(/(?:^|;\s*)kucir_session=([^;]+)/);
+  const m = cookie.match(/(?:^|;\s*)KONEK_session=([^;]+)/);
   if (!m) return false;
   const [expires, sig] = m[1].split(".");
   if (!expires || !sig || Number(expires) < Math.floor(Date.now()/1000)) return false;
@@ -365,28 +365,28 @@ function shell(title, body, extraHead="") {
   return `<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071426"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><title>${title}</title>${extraHead}<style>${styles()}</style></head><body>${body}</body></html>`;
 }
 function homePage(origin) {
-  return shell("KUCIRLINK — Shortlink Cepat & Ringkas", `
+  return shell("KONEKLINK — Shortlink Cepat & Ringkas", `
   <main class="landing">
-    <nav><a class="brand" href="/"><span class="mark">K</span><span>KUCIR<span class="accent">LINK</span></span></a><a class="navbtn" href="/admin">Admin</a></nav>
+    <nav><a class="brand" href="/"><span class="mark">K</span><span>KONEK<span class="accent">LINK</span></span></a><a class="navbtn" href="/admin">Admin</a></nav>
     <section class="hero">
       <div class="eyebrow">SHORT URL • FAST REDIRECT</div>
       <h1>Link panjang,<br><span>dibuat lebih ringkas.</span></h1>
-      <p>KUCIRLINK membantu mengelola tautan pendek di domain sendiri dengan redirect cepat melalui jaringan Cloudflare.</p>
+      <p>KONEKLINK membantu mengelola tautan pendek di domain sendiri dengan redirect cepat melalui jaringan Cloudflare.</p>
       <div class="demo"><span>${escapeHtml(origin.replace(/^https?:\/\//,''))}/</span><b>namalink</b><button onclick="location.href='/admin'">Buat Shortlink</button></div>
       <div class="trust"><div><b>⚡</b><span><strong>Edge Redirect</strong>Respons cepat</span></div><div><b>🔒</b><span><strong>Admin Aman</strong>Akses terlindungi</span></div><div><b>📊</b><span><strong>Click Stats</strong>Pantau performa</span></div></div>
     </section>
-    <footer>© ${new Date().getFullYear()} KUCIRLINK · Powered by Cloudflare Workers</footer>
+    <footer>© ${new Date().getFullYear()} KONEKLINK · Powered by Cloudflare Workers</footer>
   </main>`);
 }
 function adminPage() {
-  return shell("Admin — KUCIRLINK", `
+  return shell("Admin — KONEKLINK", `
   <div id="toast" class="toast"></div>
   <section id="loginView" class="login-wrap">
-    <div class="login-card"><a class="brand center" href="/">${brandMarkSvg()}<span class="brand-copy"><b>KUCIR<span class="accent">LINK</span></b><small>Shorten Today, Go Further</small></span></a><div class="login-badge">ADMIN CONSOLE</div><h1>Selamat datang</h1><p>Masuk untuk mengelola seluruh shortlink KUCIRLINK.</p><form id="loginForm"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Masukkan password admin" required><button class="primary wide">Masuk ke Dashboard</button></form></div>
+    <div class="login-card"><a class="brand center" href="/">${brandMarkSvg()}<span class="brand-copy"><b>KONEK<span class="accent">LINK</span></b><small>Shorten Today, Go Further</small></span></a><div class="login-badge">ADMIN CONSOLE</div><h1>Selamat datang</h1><p>Masuk untuk mengelola seluruh shortlink KONEKLINK.</p><form id="loginForm"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Masukkan password admin" required><button class="primary wide">Masuk ke Dashboard</button></form></div>
   </section>
   <section id="appView" class="app hidden">
     <aside>
-      <a class="brand sidebrand" href="/">${brandMarkSvg()}<span class="brand-copy"><b>KUCIR<span class="accent">LINK</span></b><small>Shorten Today, Go Further</small></span></a>
+      <a class="brand sidebrand" href="/">${brandMarkSvg()}<span class="brand-copy"><b>KONEK<span class="accent">LINK</span></b><small>Shorten Today, Go Further</small></span></a>
       <nav class="sidenav">
         <button class="navitem active" data-go="top"><span class="navico">⌂</span><span>Dashboard</span></button>
         <button id="sideNewBtn" class="navitem"><span class="navico">↗</span><span>Buat Shortlink</span></button>
@@ -411,14 +411,14 @@ function adminPage() {
         <div class="table-wrap"><table><thead><tr><th class="checkcol"><span class="mobile-select">Pilih</span></th><th>SHORTLINK</th><th>URL TUJUAN</th><th>TOTAL KLIK</th><th>DIBUAT PADA</th><th>STATUS</th><th>AKSI</th></tr></thead><tbody id="rows"></tbody></table></div><div id="empty" class="empty hidden"><div>⌁</div><strong>Belum ada shortlink</strong><span>Klik “Buat Shortlink Baru” untuk menambahkan link pertama.</span></div>
         <div class="panel-foot"><span id="footerCount">Menampilkan 0 shortlink</span><div class="pager"><button disabled>‹</button><b>1</b><button disabled>›</button><span>Semua / halaman</span></div></div>
       </section>
-      <footer class="dashfooter"><a class="mini-brand" href="/">${brandMarkSvg()}<span><b>KUCIR<span class="accent">LINK</span></b><small>Shorten Today, Go Further</small></span></a><span>© ${new Date().getFullYear()} KUCIRLINK. All rights reserved.</span><span>Sederhana&nbsp;&nbsp;•&nbsp;&nbsp;Cepat&nbsp;&nbsp;•&nbsp;&nbsp;Aman&nbsp;&nbsp;•&nbsp;&nbsp;Global</span></footer>
+      <footer class="dashfooter"><a class="mini-brand" href="/">${brandMarkSvg()}<span><b>KONEK<span class="accent">LINK</span></b><small>Shorten Today, Go Further</small></span></a><span>© ${new Date().getFullYear()} KONEKLINK. All rights reserved.</span><span>Sederhana&nbsp;&nbsp;•&nbsp;&nbsp;Cepat&nbsp;&nbsp;•&nbsp;&nbsp;Aman&nbsp;&nbsp;•&nbsp;&nbsp;Global</span></footer>
     </main>
   </section>
   <div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><span class="modal-kicker">SHORTLINK MANAGER</span><h2 id="modalTitle">Buat Shortlink</h2><p>Masukkan URL tujuan dan slug pilihanmu.</p></div><button id="closeModal" class="iconbtn">×</button></div><form id="linkForm"><input id="editingSlug" type="hidden"><label>Judul <small>opsional</small></label><input id="title" maxlength="120" placeholder="Contoh: Website Utama"><label>URL Tujuan</label><input id="target" type="url" placeholder="https://example.com/halaman-panjang" required><label>Custom Slug <small>kosongkan untuk otomatis</small></label><div class="slugfield"><span id="originLabel"></span><input id="slug" maxlength="64" placeholder="namalink"></div><div class="checks"><label><input id="active" type="checkbox" checked> Aktif</label><label><input id="permanent" type="checkbox"> Redirect permanen (301)</label></div><div class="actions"><button type="button" id="cancelModal" class="secondary">Batal</button><button class="primary">Simpan Shortlink</button></div></form></div></div>
   <script>${adminScript()}</script>`, `<meta name="robots" content="noindex,nofollow">`);
 }
-function notFoundPage(){ return shell("404 — KUCIRLINK", `<main class="centerpage"><a class="brand center" href="/"><span class="mark">K</span><span>KUCIR<span class="accent">LINK</span></span></a><div class="code">404</div><h1>Shortlink tidak ditemukan</h1><p>Tautan mungkin salah, sudah dihapus, atau sedang dinonaktifkan.</p><a class="primary linkbtn" href="/">Kembali ke Beranda</a></main>`); }
-function errorPage(){ return shell("Error — KUCIRLINK", `<main class="centerpage"><div class="code">500</div><h1>Terjadi kesalahan</h1><p>Silakan coba kembali beberapa saat lagi.</p></main>`); }
+function notFoundPage(){ return shell("404 — KONEKLINK", `<main class="centerpage"><a class="brand center" href="/"><span class="mark">K</span><span>KONEK<span class="accent">LINK</span></span></a><div class="code">404</div><h1>Shortlink tidak ditemukan</h1><p>Tautan mungkin salah, sudah dihapus, atau sedang dinonaktifkan.</p><a class="primary linkbtn" href="/">Kembali ke Beranda</a></main>`); }
+function errorPage(){ return shell("Error — KONEKLINK", `<main class="centerpage"><div class="code">500</div><h1>Terjadi kesalahan</h1><p>Silakan coba kembali beberapa saat lagi.</p></main>`); }
 
 function adminScript(){ return `
 const $=s=>document.querySelector(s); let links=[]; const selected=new Set();
