@@ -105,14 +105,14 @@ async function handleApi(request, env) {
     const payload = `${expires}`;
     const sig = await hmac(payload, env.SESSION_SECRET);
     return json({ ok: true }, 200, {
-      "Set-Cookie": `KONEK_session=${payload}.${sig}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=43200`
+      "Set-Cookie": `kucir_session=${payload}.${sig}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=43200`
     });
   }
 
   if (path === "/api/logout" && request.method === "POST") {
     if (!sameOrigin(request)) return json({ error: "Forbidden" }, 403);
     return json({ ok: true }, 200, {
-      "Set-Cookie": "KONEK_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0"
+      "Set-Cookie": "kucir_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0"
     });
   }
 
@@ -316,7 +316,7 @@ async function randomSlug(env, length = 8) {
 async function isAuthed(request, env) {
   if (!env.SESSION_SECRET) return false;
   const cookie = request.headers.get("Cookie") || "";
-  const m = cookie.match(/(?:^|;\s*)KONEK_session=([^;]+)/);
+  const m = cookie.match(/(?:^|;\s*)kucir_session=([^;]+)/);
   if (!m) return false;
   const [expires, sig] = m[1].split(".");
   if (!expires || !sig || Number(expires) < Math.floor(Date.now()/1000)) return false;
@@ -375,7 +375,7 @@ function homePage(origin) {
       <div class="demo"><span>${escapeHtml(origin.replace(/^https?:\/\//,''))}/</span><b>namalink</b><button onclick="location.href='/admin'">Buat Shortlink</button></div>
       <div class="trust"><div><b>⚡</b><span><strong>Edge Redirect</strong>Respons cepat</span></div><div><b>🔒</b><span><strong>Admin Aman</strong>Akses terlindungi</span></div><div><b>📊</b><span><strong>Click Stats</strong>Pantau performa</span></div></div>
     </section>
-    <footer>© ${new Date().getFullYear()} KONEKLINK · Powered by Cloudflare Workers</footer>
+    <footer>© ${new Date().getFullYear()} KONEKLINK · Powered by Adik</footer>
   </main>`);
 }
 function adminPage() {
