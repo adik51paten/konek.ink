@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "shortlink",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-08",
+  "workers_dev": true,
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CLICK_COUNTER",
+        "class_name": "ClickCounter"
+      }
+    ]
+  },
+  "exports": {
+    "ClickCounter": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "kucirlink-db",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+    }
+  ]
+}
