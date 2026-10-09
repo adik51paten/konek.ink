@@ -21,8 +21,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "kucirlink-db",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+      "database_name": "db-shortlink",
+      "database_id": "fc2a8b6b-4a29-4236-97a9-0f468624bf80"
     }
   ]
 }
